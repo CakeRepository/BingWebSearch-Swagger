@@ -1,0 +1,379 @@
+swagger: '2.0'
+info:
+  title: Bing Web Search API v7
+  description: >-
+    The Web Search API lets you send a search query to Bing and get back search
+    results that include links to webpages, images, and more.
+  version: '7.0'
+host: api.bing.microsoft.com
+schemes:
+  - https
+basePath: /v7.0
+produces:
+  - application/json
+  - application/ld+json
+paths:
+  /search:
+    get:
+      summary: Bing Search Query
+      parameters:
+        - name: q
+          in: query
+          description: The user's search query string
+          required: true
+          type: string
+        - name: Accept-Language
+          in: header
+          description: >-
+            A comma-delimited list of languages to use for user interface
+            strings.
+          required: false
+          type: string
+        - name: setLang
+          in: query
+          description: The language to use for user interface strings.
+          required: false
+          type: string
+        - name: cc
+          in: query
+          description: >-
+            A 2-character country code of the country where the results come
+            from.
+          required: false
+          type: string
+        - name: mkt
+          in: query
+          description: The market where the results come from.
+          required: false
+          type: string
+        - name: safeSearch
+          in: query
+          description: A filter used to filter results for adult content.
+          required: false
+          type: string
+          enum:
+            - 'Off'
+            - Moderate
+            - Stric
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SearchResponse'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not Found
+      description: >-
+        Sends a search query to Bing and gets back search results that include
+        links to webpages, images, and more.
+      operationId: Bing_Search
+definitions:
+  WebPage:
+    type: object
+    properties:
+      id:
+        type: string
+        description: An ID that uniquely identifies the webpage
+      name:
+        type: string
+        description: The title of the webpage
+      url:
+        type: string
+        description: The URL to the webpage
+      displayUrl:
+        type: string
+        description: The display version of the URL to the webpage
+      snippet:
+        type: string
+        description: A snippet of text from the webpage
+      dateLastCrawled:
+        type: string
+        format: date-time
+        description: The date and time that Bing last crawled the webpage
+  RankingRankingGroup:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/RankingRankingItem'
+  RankingRankingItem:
+    type: object
+    properties:
+      answerType:
+        type: string
+        description: The answer type that the item is part of
+      resultIndex:
+        type: integer
+        format: int32
+        description: The index of the item in the search results list
+  Thing:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the thing
+  News:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      readLink:
+        type: string
+        description: The URL to Bing's search result for this query
+      totalEstimatedMatches:
+        type: integer
+        format: int64
+        description: The estimated number of news articles that are relevant to the query
+      value:
+        type: array
+        items:
+          $ref: '#/definitions/NewsArticle'
+      sort:
+        type: array
+        items:
+          $ref: '#/definitions/SortOption'
+      category:
+        type: string
+        description: The category of the news articles in the response
+  RelatedSearches:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      id:
+        type: string
+        description: An ID that uniquely identifies the answer
+      value:
+        type: array
+        items:
+          $ref: '#/definitions/Query'
+  SortOption:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the sort option
+      id:
+        type: string
+        description: The ID that uniquely identifies the sort option
+      isSelected:
+        type: boolean
+        description: A Boolean value that indicates whether the sort option is selected
+      url:
+        type: string
+        description: The URL that returns the results sorted by this option
+  NewsArticle:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The headline of the news article
+      url:
+        type: string
+        description: The URL to the news article
+      image:
+        $ref: '#/definitions/ImageObject'
+      description:
+        type: string
+        description: A snippet of text from the news article
+      provider:
+        type: array
+        items:
+          $ref: '#/definitions/Thing'
+      datePublished:
+        type: string
+        format: date-time
+        description: The date and time that the article was published
+  Query:
+    type: object
+    properties:
+      text:
+        type: string
+        description: The query string
+      displayText:
+        type: string
+        description: The display version of the query string
+      webSearchUrl:
+        type: string
+        description: The URL to Bing's search result for this query
+  RankingResponse:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      pole:
+        $ref: '#/definitions/RankingRankingGroup'
+      mainline:
+        $ref: '#/definitions/RankingRankingGroup'
+      sidebar:
+        $ref: '#/definitions/RankingRankingGroup'
+  SearchResponse:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      queryContext:
+        $ref: '#/definitions/QueryContext'
+      webPages:
+        $ref: '#/definitions/WebWebAnswer'
+      images:
+        $ref: '#/definitions/Images'
+      videos:
+        $ref: '#/definitions/Videos'
+      news:
+        $ref: '#/definitions/News'
+      relatedSearches:
+        $ref: '#/definitions/RelatedSearches'
+      rankingResponse:
+        $ref: '#/definitions/RankingResponse'
+  QueryContext:
+    type: object
+    properties:
+      originalQuery:
+        type: string
+        description: The query string as entered by the user
+      alteredQuery:
+        type: string
+        description: The query string that Bing used for the request
+      adultIntent:
+        type: boolean
+        description: A Boolean value that indicates whether the query has adult intent
+  WebWebAnswer:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      webSearchUrl:
+        type: string
+        description: The URL to Bing's search result for this query
+      totalEstimatedMatches:
+        type: integer
+        format: int64
+        description: The estimated number of webpages that are relevant to the query
+      value:
+        type: array
+        items:
+          $ref: '#/definitions/WebPage'
+      someResultsRemoved:
+        type: boolean
+        description: >-
+          A Boolean value that indicates whether the response excluded some
+          results from the answer
+  ImageObject:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the image
+      thumbnailUrl:
+        type: string
+        description: The URL to a thumbnail of the image
+      contentUrl:
+        type: string
+        description: The URL to the full-size image
+      hostPageUrl:
+        type: string
+        description: The URL of the webpage that contains the image
+      width:
+        type: integer
+        format: int32
+        description: The width of the image in pixels
+      height:
+        type: integer
+        format: int32
+        description: The height of the image in pixels
+      thumbnail:
+        $ref: '#/definitions/ImageObject'
+      imageInsightsToken:
+        type: string
+        description: An ID that you use to get additional information about the image
+  Images:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      webSearchUrl:
+        type: string
+        description: The URL to Bing's search result for this query
+      totalEstimatedMatches:
+        type: integer
+        format: int64
+        description: The estimated number of images that are relevant to the query
+      nextOffsetAddCount:
+        type: integer
+        format: int32
+        description: >-
+          The number of images to skip past in order to get to the next page of
+          results
+      value:
+        type: array
+        items:
+          $ref: '#/definitions/ImageObject'
+      queryExpansions:
+        type: array
+        items:
+          $ref: '#/definitions/Query'
+      similarTerms:
+        type: array
+        items:
+          $ref: '#/definitions/Query'
+      relatedSearches:
+        type: array
+        items:
+          $ref: '#/definitions/Query'
+  Videos:
+    type: object
+    properties:
+      _type:
+        type: string
+        description: The type of the response
+      webSearchUrl:
+        type: string
+        description: The URL to Bing's search result for this query
+      totalEstimatedMatches:
+        type: integer
+        format: int64
+        description: The estimated number of videos that are relevant to the query
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The error code that identifies the category of error
+      message:
+        type: string
+        description: A description of the error
+      moreDetails:
+        type: string
+        description: A description that provides additional information about the error
+      parameter:
+        type: string
+        description: The parameter in the request that caused the error
+      value:
+        type: string
+        description: The parameter value in the request that was not valid
+securityDefinitions:
+  API Key:
+    type: apiKey
+    in: header
+    name: Ocp-Apim-Subscription-Key
+security:
+  - API Key: []
